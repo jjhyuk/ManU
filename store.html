@@ -1,0 +1,242 @@
+<?php
+$db = mysql_connect("localhost","root","sql");
+if(!$db)
+{
+  die('MySQL ERROR:'.mysql_error());
+}
+$ret = mysql_select_db('userProfile',$db);
+
+if(!ret)
+{
+  die('MySQL ERROR:'.mysql_error());
+}
+
+session_start();
+$user_id =$_SESSION[user_id];
+
+$recent_list = array() ;
+$data = array();
+
+if(!isset($_SESSION[is_login])){
+if(isset($_COOKIE['NO_MEMBER']))
+{
+  $recent_list = unserialize($_COOKIE['NO_MEMBER']);
+}
+else
+{
+  setcookie('NO_MEMBER',serialize($recent_list),time()+60*60*24);
+}
+}
+else
+{
+  $recent_login_sql = "SELECT * from recent where user_id = " . "'".$user_id."'";
+
+  $recent_login_query = mysql_query($recent_login_sql);
+  $lenth = mysql_num_rows($recent_login_query);
+
+
+  for ($i = 0; $i < $lenth; $i++) {
+    // 데이터 가져오기
+    mysql_data_seek($recent_login_query, $i);
+    $row = mysql_fetch_array($recent_login_query);
+    array_unshift($data,$row['p_num']);
+
+  }
+  $data_change =array_unique($data);
+
+
+}
+
+
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Online Store</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/3-col-portfolio.css" rel="stylesheet">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      $("#logout").click(function() {
+        $.ajax({
+          type: "POST",
+          url: "logout.php",
+          success: function(response) {
+            if(response == 'success') {
+              alert('로그아웃되었습니다!');
+
+              location.reload();
+            }
+
+            else {
+              alert('로그아웃에 실패하셨습니다');
+            }
+          }
+        });
+        return false;
+      });
+    });
+    </script>
+
+
+
+  </head>
+
+  <body>
+
+    <?php include ("navbar"); ?>
+
+    <!-- Page Content -->
+    <div class="container">
+      <h3> 최근 본 상품 </h3>
+      <table class="table" style="margin:0">
+        <tr>
+      <?php
+
+
+      $set ;
+
+      if(!isset($_SESSION[is_login])){
+  $set = array_unique($recent_list);
+      }
+      else
+      {
+          $set = array_unique($data);
+      }
+
+      $cnt =0;
+      foreach($set as $item) {
+
+        ?>
+        <th>
+          <figure>
+            <a style="color:black" href="show_product.html?no=<?= $item?>">
+          <?php
+
+          $sql_recent = "SELECT * FROM store WHERE no =".$item;
+          $recent_query = mysql_query($sql_recent);
+          $recent_row = mysql_fetch_array($recent_query);
+          echo "<img src=".$recent_row[p_image_front]." width=50px height=50px /><br>";
+          echo $recent_row['p_name'];
+          ?>
+        </a>
+        </figure>
+        </th>
+        <?php
+
+      }
+      ?>
+        </tr>
+    </table>
+      <!-- Page Heading -->
+      <h1 class="my-4">온라인스토어
+        <small>맨유의 제품을 만나보세요!</small>
+      </h1>
+<div class="row">
+      <?php
+      $sql_store = "select * from store";
+      $result = mysql_query($sql_store);
+      $total_len_store = mysql_num_rows($result);
+
+      for($i = 0 ; $i<$total_len_store;$i++)
+      {
+      mysql_data_seek($result,$i);
+      $row = mysql_fetch_array($result);
+
+      ?>
+
+
+       <div class="col-lg-3 col-sm-6 portfolio-item">
+          <div class="card h-100">
+            <a href="show_product.html?no=<?= $row['no']?>">
+            <?php
+             echo "<img src=".$row[p_image_front]." />";
+
+             ?>
+            </a>
+          <div class="card-body">
+            <h4 class="card-title">
+                <a href="show_product.html?no=<?= $row['no']?>">
+                  <?php echo $row['p_name'];
+                ?>
+                </a>
+              </h4>
+              <p class="card-text">
+              <?php echo $row['p_price']; ?>원
+              </p>
+            </div>
+          </div>
+        </div>
+
+
+      <?php
+      }
+      ?>
+  </div>
+
+
+
+
+
+
+
+
+      <a href="store_write.html" >
+      <button class="btn btn-lg btn-default " type="button">글작성</button>
+    </a>
+      <!-- /.row -->
+
+      <!-- Pagination -->
+      <!--
+      <ul class="pagination justify-content-center">
+        <li class="page-item">
+          <a class="page-link" href="#" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Previous</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#">1</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#">2</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#">3</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Next</span>
+          </a>
+        </li>
+      </ul>
+
+    </div>
+  -->
+    <!-- /.container -->
+
+
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+
+</html>

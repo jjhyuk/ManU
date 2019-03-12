@@ -1,0 +1,148 @@
+<?php
+$db = mysql_connect("localhost","root","sql");
+if(!$db)
+{
+
+  die('MySQL ERROR:'.mysql_error());
+}
+$ret = mysql_select_db('userProfile',$db);
+
+if(!ret)
+{
+
+  die('MySQL ERROR:'.mysql_error());
+}
+
+session_start();
+
+$price = $_GET['sum'];
+$first = $_GET['first'];
+$lenth = $_GET['lenth'];
+$cnt = $_GET['cnt'];
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>manU</title>
+
+
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/full-slider.css" rel="stylesheet">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+
+  </head>
+  <body>
+  <?php include ("navbar"); ?>
+
+  <h1> HI </h1>
+
+  <div class="container">
+    <div class="table-responsive">
+      <table class="table">
+        <tbody>
+
+          <form method="post" name="trade" id="trade" action="test_.html?price=<?= $price ?>&first=<?= $first ?>&lenth=<?= $lenth ?>&cnt=<?= $cnt ?>">
+            <tr> <h1>이름</h1>
+            <input type="text" id="name" name="name" placeholder="이름"><br></tr>
+            <tr>   <h1>전화번호</h1>
+              <input type="text" id="number" name="number" placeholder="전화번호"><br></tr>
+            <tr>   <h1>이메일</h1>
+              <input type="email" id="mail" name="mail" placeholder="이메일"><br></tr>
+            <tr>   <h1>주소</h1>
+              <input type="text" id="postcode" name="postcode" placeholder="우편번호">
+              <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기"><br>
+              <input type="text" id="roadAddress" name="roadAddress" placeholder="도로명주소">
+              <input type="text" id="jibunAddress" name="jibunAddress" placeholder="지번주소">
+              <input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소"><br><br><br></tr>
+
+              <th>
+                <?php echo $first ." 등 ".$lenth."종   ".$cnt."개 "."상품   ".$price."원"?>
+              </th>
+            <th>
+              <input type="submit" class="btn" value="주문하기">
+            </th>
+          </form>
+
+
+        </tbody>
+
+
+
+
+
+  <span id="guide" style="color:#999"></span>
+
+  <script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
+  <script>
+      //본 예제에서는 도로명 주소 표기 방식에 대한 법령에 따라, 내려오는 데이터를 조합하여 올바른 주소를 구성하는 방법을 설명합니다.
+      function sample4_execDaumPostcode() {
+          new daum.Postcode({
+              oncomplete: function(data) {
+                  // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                  // 도로명 주소의 노출 규칙에 따라 주소를 조합한다.
+                  // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                  var fullRoadAddr = data.roadAddress; // 도로명 주소 변수
+                  var extraRoadAddr = ''; // 도로명 조합형 주소 변수
+
+                  // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                  // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                  if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                      extraRoadAddr += data.bname;
+                  }
+                  // 건물명이 있고, 공동주택일 경우 추가한다.
+                  if(data.buildingName !== '' && data.apartment === 'Y'){
+                     extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                  }
+                  // 도로명, 지번 조합형 주소가 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                  if(extraRoadAddr !== ''){
+                      extraRoadAddr = ' (' + extraRoadAddr + ')';
+                  }
+                  // 도로명, 지번 주소의 유무에 따라 해당 조합형 주소를 추가한다.
+                  if(fullRoadAddr !== ''){
+                      fullRoadAddr += extraRoadAddr;
+                  }
+
+                  // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                  document.getElementById('postcode').value = data.zonecode; //5자리 새우편번호 사용
+                  document.getElementById('roadAddress').value = fullRoadAddr;
+                  document.getElementById('jibunAddress').value = data.jibunAddress;
+
+                  // 사용자가 '선택 안함'을 클릭한 경우, 예상 주소라는 표시를 해준다.
+                  if(data.autoRoadAddress) {
+                      //예상되는 도로명 주소에 조합형 주소를 추가한다.
+                      var expRoadAddr = data.autoRoadAddress + extraRoadAddr;
+                      document.getElementById('guide').innerHTML = '(예상 도로명 주소 : ' + expRoadAddr + ')';
+
+                  } else if(data.autoJibunAddress) {
+                      var expJibunAddr = data.autoJibunAddress;
+                      document.getElementById('guide').innerHTML = '(예상 지번 주소 : ' + expJibunAddr + ')';
+
+                  } else {
+                      document.getElementById('guide').innerHTML = '';
+                  }
+              }
+          }).open();
+      }
+  </script>
+</div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    </body>
+
+    </html>

@@ -1,0 +1,242 @@
+<?php
+
+session_start();
+
+$db = mysql_connect( localhost , 'root' , 'sql!' );
+if( !$db ){
+    die('MySQL connect ERROR : ' . mysql_error());
+}
+
+$ret = mysql_select_db( 'userProfile', $db);
+if( !$ret ){
+    die('MySQL select ERROR : '. mysql_error());
+}
+
+$user_id = $_SESSION[user_id];
+$sum_price = 0;
+$first_item = 'first';
+$cnt = 0;
+
+$sql = "SELECT * FROM shopcart WHERE user_id = " . "'".$user_id."'";
+$result = mysql_query($sql);
+$shop_lenth = mysql_num_rows($result);
+
+
+
+
+session_start();
+
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title></title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/1-col-portfolio.css" rel="stylesheet">
+
+
+
+  </head>
+
+  <body>
+    <?php include ("navbar"); ?>
+
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <!-- Page Heading -->
+      <h1 class="my-4">장바구니
+        <small>선택하신 물품을 확인하세요</small>
+      </h1>
+
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th> 이미지</th>
+                <th> 제품명</th>
+                <th> 판매가격</th>
+                <th> 사이즈</th>
+                <th> 수량 </th>
+                <th> 합계</th>
+                <th> 선택</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+
+              <?php
+              for($i = 0 ; $i < $shop_lenth ; $i++)
+              {
+                mysql_data_seek($result, $i);
+                $row = mysql_fetch_array($result);
+
+                $sql_item = "SELECT * from store where no = ". $row[p_num];
+                $result_item = mysql_query($sql_item);
+                $item_info = mysql_fetch_array($result_item);
+
+              ?>
+
+              <tr>
+                <th>
+                   <img class="img-fluid rounded mb-3 mb-md-0"
+                   src="<?= $item_info[p_image_front] ?> "  width=100px />
+                    <img class="img-fluid rounded mb-3 mb-md-0"
+                     src="<?= $item_info[p_image_back] ?> "  width=100px alt=""/>
+                </th>
+                <th>
+                    <?php echo $item_info['p_name'];
+                    if(!strcmp($first_item,'first'))
+                    {
+                     $first_item =  $item_info['p_name'];
+                   }
+                    ?>
+                </th>
+                <th>
+                  <?php echo $item_info['p_price'];
+                  $sum_price += $item_info['p_price']*$row['quantity']; ?>원
+                </th>
+                <th>
+                  <?php echo $row['size']; ?>
+                </th>
+                <th>
+                <form action="shopcart_change.php?" method="get">
+                  <input type="hidden" id="cartnum" name="cartnum" value="<?= $row[cartnum] ?>"/>
+                  <input style="width:75px" type="number" value="<?= $row['quantity']; ?>" id="change_num" name="change_num" />
+                  <input type="submit" value="변경"/>
+                </form>
+                  <?php
+
+                  $cnt += $row['quantity']; ?>
+
+                </th>
+
+                <th>
+                  <?php
+                  $sum = $item_info['p_price']*$row['quantity'];
+                  echo $sum ?>원
+                </th>
+
+                <th>
+
+                <form id="cart_delete" name="cart_delete" method="GET"
+                action="cart_remove.php">
+                <input type="hidden" name="no" value="<?= $row[cartnum] ?>"/>
+                <input type="submit" value="삭제"/>
+                </form>
+                </th>
+
+
+
+              </tr>
+              <?php
+              }
+              ?>
+
+              <!-- /.row -->
+            </tbody>
+          </table>
+
+          <table>
+            <table class="table">
+              <colgroup>
+                <col width="30%"/>
+                <col width="47%"/>
+                <col width="13%"/>
+                <col width="10%"/>
+
+
+
+              </colgroup>
+              <thead>
+                <tr>
+                  <th> </th>
+                  <th> </th>
+                  <th> 합계</th>
+                  <th> 선택</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <th>
+                </th>
+                <th>
+                  <?php echo $first_item ." 등 ".$shop_lenth."종   ".$cnt."개 "."상품" ?>
+                </th>
+                <th>
+                  <?php echo $sum_price; ?>원
+                </th>
+                <th>
+                  <a href="trade.html?sum=<?= $sum_price ?>&first=<?= $first_item ?>&lenth=<?= $shop_lenth ?>&cnt=<?= $cnt ?>">
+
+                  <button> 구매하기</button></a>
+                </th>
+              </tbody>
+          </table>
+
+          </div>
+
+
+
+
+    </div>
+
+
+      <hr>
+
+      <!-- Pagination -->
+      <!--
+      <ul class="pagination justify-content-center">
+        <li class="page-item">
+          <a class="page-link" href="#" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Previous</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#">1</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#">2</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#">3</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Next</span>
+          </a>
+        </li>
+      </ul>
+
+    </div>
+  -->
+    <!-- /.container -->
+
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+
+</html>

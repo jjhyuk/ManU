@@ -1,0 +1,246 @@
+<?php
+
+session_start();
+
+$db = mysql_connect( localhost , 'root' , 'sql' );
+if( !$db ){
+    die('MySQL connect ERROR : ' . mysql_error());
+}
+
+$ret = mysql_select_db( 'userProfile', $db);
+if( !$ret ){
+    die('MySQL select ERROR : '. mysql_error());
+}
+
+
+// 한 페이지에 보여줄 리스트 수
+$record_per_page = 10;
+// 한 블럭에 보여줄 페이지 수
+$page_per_block = 10;
+// 현재 페이지
+$now_page = ($_GET['page']) ? $_GET['page'] : 1;
+// 현재 블럭
+$now_block = ceil($now_page / $page_per_block);
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+
+  <title></title>
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/full-slider.css" rel="stylesheet">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="js/bootstrap.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $("#logout").click(function() {
+      $.ajax({
+        type: "POST",
+        url: "logout.php",
+        success: function(response) {
+          if(response == 'success') {
+            alert('로그아웃되었습니다!');
+
+            location.reload();
+          }
+
+          else {
+            alert('로그아웃에 실패하셨습니다');
+          }
+        }
+      });
+      return false;
+    });
+  });
+  </script>
+</head>
+
+
+
+<body>
+  <?php include ("navbar"); ?>
+
+
+
+
+
+    <!-- 게시글들을 모아놓는 테이블 -->
+      <div >
+      <div class="container">
+        <div class="table-responsive">
+          <table class="table ">
+            <colgroup>
+              <col width="10%"/>
+              <col width="50%"/>
+              <col width="15%"/>
+              <col width="15%"/>
+                <col width="10%"/>
+
+
+            </colgroup>
+            <thead>
+              <tr>
+
+                <th>  </th>
+                <th> 게시글 제목 </th>
+                <th> 작성자 </th>
+                <th> 작성시간</th>
+                <th> 조회수</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+
+              $result = mysql_query( "SELECT * FROM board ");
+              $total_record = mysql_num_rows($result);
+
+
+              $sql = "SELECT * FROM board ORDER BY no DESC LIMIT ".$record_per_page * ($now_page - 1) .",". $record_per_page * $now_page;
+
+              $resource = mysql_query( $sql );
+              $total_test = mysql_num_rows($resource);
+			for ($i = 0; $i < $total_test; $i++) {
+			  // 데이터 가져오기
+			  mysql_data_seek($resource, $i);
+			  $row = mysql_fetch_array($resource);
+			?>
+      <tr>
+          <?php
+
+            $index = $row['no'];
+             ?>
+
+             <th>
+
+               <?php
+               if($row[imageAdr]!=null)
+               {
+              echo "<img src=".$row[imageAdr]." width=100px height=100px />";
+              }
+               ?>
+
+             </th>
+          <td ><a style="color:black"href="read.html?no=<?= $row['no']?>">
+             <?php
+             $sql_comment = "SELECT * FROM comment where comment_num = $index";
+             $result_comment = mysql_query($sql_comment);
+             $total_len_comment = mysql_num_rows($result_comment);
+
+              echo $row['title'];
+
+              if($total_len_comment!=0){
+              echo "<font color=blue>";
+              echo "[";
+              echo $total_len_comment;
+              echo "]";
+              echo "</font>";
+
+            }
+
+              ?>
+           </a></td>
+
+          <td ><?php echo $row['user_id']; ?></td>
+          <td ><?php
+
+            date_default_timezone_set("Asia/Seoul");
+            $today = date("y-m-d H:i:s",time());
+            $todayVar = substr($today,0,10);
+
+            $compare = $row['write_time'];
+            $compareVar = substr($compare,0,10);
+
+            if(!strcmp($todayVar,$compareVar)){
+            $time = $row['write_time'];
+            $timeVar = substr($time,9,20);
+            echo $timeVar;
+          }
+          else {
+            echo $row['write_time'];;
+          }
+
+
+            ?></td>
+          <td ><?php echo $row['view']; ?></td>
+
+      			<?php }?>
+
+
+
+
+    </tr>
+
+            </tbody>
+          </table>
+          <?php
+          if(isset($_SESSION[is_login])){
+          ?>
+          <a href="boardWrite.html"><button class="btn btn-default">글쓰기</button></a>
+          <?php
+        }
+          ?>
+
+          <div>
+	    <tr>
+
+			<?php
+
+                        // 전체 페이지 수
+			$total_page = ceil($total_record / $record_per_page);
+                        // 전체 블럭 수
+			$total_block = ceil($total_page / $page_per_block);
+
+                        // 현재 블럭이 1보다 클 경우
+			if(1 < $now_block ) {
+			  $pre_page = ($now_block - 1) * $page_per_block;
+			  echo '<a href="board.html?page='.$pre_page.'">이전</a>';
+
+			}
+
+			$start_page = ($now_block - 1) * $page_per_block + 1;
+			$end_page = $now_block * $page_per_block;
+
+                        // 총 페이지와 마지막 페이지를 같게 하기, 즉 글이 있는 페이지까지만 설정
+			if($end_page > $total_page) {
+			  $end_page = $total_page;
+			}
+
+			?>
+
+			<?php for($i = $start_page; $i <= $end_page; $i++) {?>
+			    <td><a href="board.html?page=<?= $i ?>"><?= $i ?></a></td>
+			<?php }?>
+
+			<?php
+                        // 현재 블럭이 총 블럭 수 보다 작을 경우
+			if($now_block < $total_block) {
+			  $post_page = $now_block * $page_per_block + 1;
+			  echo '<a href="board.html?page='.$post_page.'">다음</a>';
+			}
+
+			?>
+		</tr>
+	</div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+</body>
+</html>

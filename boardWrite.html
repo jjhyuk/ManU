@@ -1,0 +1,97 @@
+<?php
+$db = mysql_connect("localhost","root","sql");
+if(!$db)
+{
+  die('MySQL ERROR:'.mysql_error());
+}
+$ret = mysql_select_db('userProfile',$db);
+
+if(!ret)
+{
+  die('MySQL ERROR:'.mysql_error());
+}
+
+session_start();
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/full-slider.css" rel="stylesheet">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $("#logout").click(function() {
+      $.ajax({
+        type: "POST",
+        url: "logout.php",
+        success: function(response) {
+          if(response == 'success') {
+            alert('로그아웃되었습니다!');
+
+            location.reload();
+          }
+
+          else {
+            alert('로그아웃에 실패하셨습니다');
+          }
+        }
+      });
+      return false;
+    });
+  });
+  </script>
+</head>
+
+<body>
+    <?php include ("navbar"); ?>
+
+
+
+  <div >
+     <div class="container">
+       <form class="form-horizontal" method="post" action="write_ok.php" enctype="multipart/form-data">
+         <div class="form-group">
+           <label for="inputEmail3" class="col-sm-2 control-label"> 제목 </label>
+           <div class="col-sm-10">
+             <input type="text" name="title" class="form-control" id="inputEmail3" placeholder="제목">
+           </div>
+         </div>
+         <div class="form-group">
+           <label for="inputPassword3" class="col-sm-2 control-label"> 게시글 </label>
+           <div class="col-sm-10">
+             <textarea class="form-control" rows="10" name="text" ></textarea>
+           </div>
+         </div>
+         <div class="form-group">
+           <div class="col-sm-offset-2 col-sm-10">
+             <button type="submit" class="btn btn-default">작성 완료</button>
+           </div>
+         </div>
+         <div class="form-group">
+           <div class="col-sm-offset-2 col-sm-10">
+             <input type="file" name="fileToUpload" id="fileToUpload">
+
+           </div>
+         </div>
+       </form>
+     </div>
+   </div>
+
+
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="js/bootstrap.js"></script>
+</body>
+</html>

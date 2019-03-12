@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>JoinUs</title>
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/full-slider.css" rel="stylesheet">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <?php include ("navbar"); ?>
+  <div class="container">
+    <form class="form" method="post" action="memberJoin.php">
+      <h2 class="form-signing-heading">환영합니다</h2>
+      <input type="text" name="user_id" class="form-control" placeholder="UserID" required autofocus>
+
+      <input type="password" name="user_pw" class="form-control" placeholder="UserPassword" required>
+      <input type="email" name="email" class="form-control" placeholder="UserEmail" required>
+      <button class="btn btn-lg btn-default " type="submit">가입하기</button>
+
+    </form>
+  </div>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="js/bootstrap.js"></script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<?php
+$db = mysql_connect("localhost","root","sql");
+if(!$db)
+{
+
+  die('MySQL ERROR:'.mysql_error());
+}
+$ret = mysql_select_db('userProfile',$db);
+
+if(!ret)
+{
+
+  die('MySQL ERROR:'.mysql_error());
+}
+
+
+
+if(!isset($_GET["no"])){
+	echo "Invalid value input";
+	exit();
+}
+$no = $_GET["no"];
+$position = $_get["position"];
+$view_sql = "UPDATE board set view = view +1 where no = $no";
+$view_result = mysql_query($view_sql);
+
+
+$sql = "SELECT * FROM board WHERE no = " . $no;
+$result = mysql_query($sql);
+$row = mysql_fetch_array($result);
+session_start();
+?>
+
+<!DOCTYPE>
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/full-slider.css" rel="stylesheet">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="js/bootstrap.js"></script>
+	<title><?= $row["title"] ?></title>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $("#logout").click(function() {
+      $.ajax({
+        type: "POST",
+        url: "logout.php",
+        success: function(response) {
+          if(response == 'success') {
+            alert('로그아웃되었습니다!');
+
+            location.reload();
+          }
+
+          else {
+            alert('로그아웃에 실패하셨습니다');
+          }
+        }
+      });
+      return false;
+    });
+  });
+  </script>
+
+
+
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $("#repleBtn").click(function() {
+      var action = $("#repleinput").attr('action');
+      var form_data = {
+        repleNo: $("#repleNo").val(),
+        repleId: $("#repleId").val(),
+        content_rep: $("#content_rep").val(),
+
+      };
+      $.ajax({
+        type: "POST",
+        url: action,
+        data: form_data,
+        success: function(response) {
+          if(response == 'success') {
+            alert('댓글을 달았습니다');
+            location.reload();
+          }
+          else {
+            alert('댓글을 달지 못했습니다!');
+          }
+        }
+      });
+      return false;
+    });
+  });
+  </script>
+</head>
+<body>
+    <?php include ("navbar"); ?>
+<?php
+$sql_exists = "select EXISTS (select * from board where no=$no) as success";
+$sql_exists_query = mysql_query($sql_exists);
+$sql_exists_result = mysql_fetch_array($sql_exists_query);
+
+if($sql_exists_result[0]==1)
+{
+?>
+	<div class="container" id="read">
+		<p class="">제목 : <?php echo $row["title"]; ?></p>
+		<p>이름 : <?= $row["user_id"]; ?></p>
+		<p>작성일 : <?= $row["write_time"]; ?></p>
+		<p>내용</p>
+    <?php  echo '<img src="' . $row[imageAdr] . '"/>';?>
+		<p id="content"><?= $row["text"] ?></p>
+    <?php
+    if($_SESSION[user_id]==$row["user_id"]){
+    ?>
+		<form action="edit.php" methoid="GET">
+			<input type="hidden" name="no" value="<?= $no ?>">
+			<button type="submit"class="btn btn-default" value="수정">수정</button>
+		</form>
+  <?php }?>
+    <?php
+    if($_SESSION[user_id]==$row["user_id"]){
+    ?>
+		<form action="remove.php" method="GET">
+			<input type="hidden" name="no" value="<?= $no?>">
+			<button type="submit" class="btn btn-default" value="삭제">삭제</button>
+		</form>
+    <?php }?>
+		<form  action="board.html">
+			<button type="submit" class="btn btn-default" value="목록가기">목록가기</button>
+		</form>
+
+    <a href="read.html?no=<?php echo $no-1; ?>&position=back" >
+      <button id="backBtn"class="btn btn-default"> 이전글 </button>
+    </a>
+
+    <a href="read.html?no=<?php echo $no+1; ?>&position=front">
+      <button id="nextBtn" class="btn btn-default"> 다음글 </button>
+    </a>
+
+
+
+        <div id="reple_result">
+            <table width="750" class="table" >
+              <?php
+
+              $sql_comment = "SELECT * FROM comment where comment_num =$no";
+              $result = mysql_query($sql_comment);
+              $total_len = mysql_num_rows($result);
+              for($i =0 ; $i<$total_len; $i++){
+                mysql_data_seek($result, $i);
+               $row = mysql_fetch_array($result);
+
+                  $num_commnet =$row['board_num'];
+                  $text_comment = $row['text'];
+                  $id_comment = $row['user_id'];
+                  $date = $row['write_date'];
+
+
+              echo "
+
+                  <tr>
+                      <td id='re_first' width='130'>
+                          <div width:120px; border-radius:10px>
+                          <div><b>$id_comment</b></div>
+
+                          </div>
+                      </td>
+                      <td id='re_second' width='620'>
+                          <div style='border-left:1px solid #888888;'>
+                          <div id='re_content'>$text_comment</div>
+                          <div id='re_date'>    $date
+                        </div>
+                          </div>
+
+                      </td>
+                      <td>
+                        ";
+                        ?>
+                        <?php
+                        if(!strcmp($_SESSION[user_id],$id_comment))
+
+                        echo "<a href=comment_remove.php?no=$num_commnet>삭제</a>";
+
+                        ?>
+                        <?php
+                        echo "
+                      </td>
+                  </tr>
+
+
+              ";
+              }
+
+
+
+
+              ?>
+
+
+            </div>
+
+          </table>
+
+
+    <h4>댓 글 달 기</h4>
+    <div id="reple">
+        <form action="reple.php" method="post" id="repleinput" name="repleinput">
+        <input type="hidden" value="<?= $no?>" name="repleNo" id="repleNo"/>
+        <input type="hidden" value="<?= $_SESSION[user_id]?>" name="repleId" id="repleId"/>
+            <table>
+                <tr>
+                    <td><textarea cols="80" rows="6" placeholder="댓글을 입력해주세요." id="content_rep"name="content_rep"></textarea></td>
+                    <td style="padding:0 0 3px 15px; ">
+                      <input type="submit" value="댓글달기" id="repleBtn" name="repleBtn" class="reple_btn" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+    </div>
+
+
+
+
+
+
+	</div>
+  <?php
+}
+else {
+  $max = mysql_query("select max(no) as max from board");
+  $max_row = mysql_fetch_array($max);
+  $min = mysql_query("select min(no) as min from board");
+  $min_row = mysql_fetch_array($min);
+
+
+
+
+  if($no < $max_row[max] && $no > $min_row[min])
+    {
+      $position = $_GET['position'];
+      echo $position;
+      $str = strcmp($position,"front");
+      echo $str;
+      if($str)
+      {
+        ?>
+        <script>location.href='read.html?no=<?php echo $no-1; ?>&position=back';</script>
+        <?php
+      }
+      else
+      {
+        ?>
+        <script>location.href='read.html?no=<?php echo $no+1; ?>&position=front';</script>
+        <?php
+      }
+    }
+
+  else{
+    ?>
+    <script> alert('마지막글입니다!');</script>
+    <script>window.history.back();</script>
+
+
+    <?php
+}
+}
+
+
+
+
+  ?>
+
+
+</body>
+</html>

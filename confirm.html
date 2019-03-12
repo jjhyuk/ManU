@@ -1,0 +1,156 @@
+<?php
+$db = mysql_connect("localhost","root","sql");
+if(!$db)
+{
+
+  die('MySQL ERROR:'.mysql_error());
+}
+$ret = mysql_select_db('userProfile',$db);
+
+if(!ret)
+{
+
+  die('MySQL ERROR:'.mysql_error());
+}
+
+session_start();
+
+$sql = "DELETE FROM shopcart where user_id =".$_SESSION['user_id'];
+$result = mysql_query($sql);
+
+$name = $_GET[name];
+$amount = $_GET[amount];
+$buyer_email = $_GET[buyer_email];
+$buyer_name  = $_GET[buyer_name];
+$buyer_tel  = $_GET[buyer_tel];
+$buyer_addr  = $_GET[buyer_addr];
+$buyer_postcode  = $_GET[buyer_postcode];
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>manU</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/1-col-portfolio.css" rel="stylesheet">
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/full-slider.css" rel="stylesheet">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+
+  </head>
+  <body>
+  <?php include ("navbar"); ?>
+
+
+      <!-- Page Content -->
+      <div class="container">
+
+        <!-- Page Heading -->
+        <h1 class="my-4">결제완료
+          <small>결제 내역을 확인하세요</small>
+        </h1>
+
+
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th> </th>
+                  <th> </th>
+
+                </tr>
+              </thead>
+
+              <tbody>
+
+                <tr>
+                  <th>
+                    상품명
+                  </th>
+                  <th>
+                      <?php echo $name;
+                      ?>
+                  </th>
+                </tr>
+                <tr>
+                  <th>
+                    금액
+                  </th>
+                  <th>
+                      <?php echo $amount ;
+                      ?>
+                  </th>
+                </tr>
+                <tr>
+                  <th>
+                    이메일
+                  </th>
+                  <th>
+                      <?php echo $buyer_email;
+                      ?>
+                  </th>
+                </tr>
+                <tr>
+                  <th>
+                    주문자
+                  </th>
+                  <th>
+                      <?php echo $buyer_name;
+                      ?>
+                  </th>
+                </tr>
+                <tr>
+                  <th>
+                    번호
+                  </th>
+                  <th>
+                      <?php echo $buyer_tel;
+                      ?>
+                  </th>
+                </tr>
+                <tr>
+                  <th>
+                    주소
+                  </th>
+                  <th>
+                      <?php echo $buyer_addr ;
+                      ?>
+                  </th>
+                </tr>
+                <tr>
+                  <th>
+                    지번
+                  </th>
+                  <th>
+                      <?php echo $buyer_postcode  ;
+                      ?>
+                  </th>
+                </tr>
+
+
+
+                <!-- /.row -->
+              </tbody>
+            </table>
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    </body>
+
+    </html>

@@ -1,0 +1,86 @@
+<?php
+$db = mysql_connect("localhost","root","sql");
+if(!$db)
+{
+
+  die('MySQL ERROR:'.mysql_error());
+}
+$ret = mysql_select_db('userProfile',$db);
+
+if(!ret)
+{
+
+  die('MySQL ERROR:'.mysql_error());
+}
+
+session_start();
+$user_id = $_SESSION[user_id];
+
+
+$name = $_POST['name'];
+$number = $_POST['number'];
+$mail = $_POST['mail'];
+$postcode = $_POST['postcode'];
+$jibun = $_POST['jibunAddress'];
+$road = $_POST['roadAddress'];
+$detail = $_POST['detailAddress'];
+$address = $jibun . $road . $detail;
+$first = $_GET['first'];
+$lenth = $_GET['lenth'];
+$price = $_GET['price'];
+$cnt = $_GET['cnt'];
+$p_name = $first ." 등 ".$lenth."종   ".$cnt."개 "."상품 ";
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+
+
+</head>
+<body>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+	<script type="text/javascript" src="https://service.iamport.kr/js/iamport.payment-1.1.5.js"></script>
+	<script>
+		var IMP = window.IMP; // 생략가능
+		 IMP.init('imp70641509');  // 가맹점 식별 코드
+
+		 IMP.request_pay({
+				pg : 'kakao', // 결제방식
+				 pay_method : 'card',	// 결제 수단
+				 merchant_uid : 'merchant_' + new Date().getTime(),
+				 name : '<?= $p_name ?>',	// order 테이블에 들어갈 주문명 혹은 주문 번호
+				 amount : '<?= $price ?>',	// 결제 금액
+				 buyer_email : '<?= $mail ?>',	// 구매자 email
+			   buyer_name :  '<?= $name ?>',	// 구매자 이름
+				 buyer_tel :  '<?= $number ?>',	// 구매자 전화번호
+				 buyer_addr :  '<?= $address ?>',	// 구매자 주소
+				 buyer_postcode :  '<?= $postcode ?>',	// 구매자 우편번호
+
+		 }, function(rsp) {
+		if ( rsp.success ) { // 성공시
+			var msg = '결제가 완료되었습니다.';
+			msg += '고유ID : ' + rsp.imp_uid;
+			msg += '상점 거래ID : ' + rsp.merchant_uid;
+			msg += '결제 금액 : ' + rsp.paid_amount;
+			msg += '카드 승인번호 : ' + rsp.apply_num;
+			<?php
+
+
+			?>
+			location.href="confirm.html?name=<?= $p_name ?>&amount=<?= $price ?>& buyer_email=<?= $mail ?>&buyer_name=<?= $name ?>&buyer_tel=<?= $number ?>&buyer_addr=<?= $address ?>&buyer_postcode=<?= $postcode ?>";
+
+
+
+		} else { // 실패시
+			var msg = '결제에 실패하였습니다.';
+			msg += '에러내용 : ' + rsp.error_msg;
+		}
+		alert(msg);
+	});
+	</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<?php
+session_start();
+$db = mysql_connect("localhost","root","sql");
+if(!$db)
+{
+  die('MySQL ERROR:'.mysql_error());
+}
+$ret = mysql_select_db('userProfile',$db);
+
+if(!ret)
+{
+  die('MySQL ERROR:'.mysql_error());
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>ManU</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/full-slider.css" rel="stylesheet">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      $("#logout").click(function() {
+        $.ajax({
+          type: "POST",
+          url: "logout.php",
+          success: function(response) {
+            if(response == 'success') {
+              alert('로그아웃되었습니다!');
+
+              location.reload();
+            }
+
+            else {
+              alert('로그아웃에 실패하셨습니다');
+            }
+          }
+        });
+        return false;
+      });
+    });
+    </script>
+
+  </head>
+
+  <body>
+    <?php include ("navbar"); ?>
+
+
+
+    <header>
+
+
+      <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+
+          <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+          <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+          <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+        </ol>
+
+        <div class="carousel-inner" role="listbox">
+          <!-- Slide One - Set the background image for this slide in the line below -->
+          <div class="carousel-item active" style="background-image: url('http://imgnews.naver.net/image/468/2018/04/08/0000369291_001_20180408032712304.jpg?type=w647')">
+            <div class="carousel-caption d-none d-md-block">
+
+              <h3 style="color:black">Best</h3>
+              <p style="color:black">맨체스터 유나이티드를 상대로 참패한 맨체스터 시티의 모습이다</p>
+              
+            </div>
+          </div>
+
+          <!-- Slide Two - Set the background image for this slide in the line below -->
+          <!--
+          <div class="carousel-item" style="background-image: url('http://placehold.it/1900x1080')">
+            <div class="carousel-caption d-none d-md-block">
+              <h3>Second Slide</h3>
+              <p>This is a description for the second slide.</p>
+            </div>
+          </div>
+        -->
+          <!-- Slide Three - Set the background image for this slide in the line below -->
+          <!--
+          <div class="carousel-item" style="background-image: url('http://placehold.it/1900x1080')">
+            <div class="carousel-caption d-none d-md-block">
+              <h3>Third Slide</h3>
+              <p>This is a description for the third slide.</p>
+            </div>
+          </div>
+        </div>
+      -->
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+
+    </header>
+
+    <!-- Page Content -->
+    <section class="py-5">
+      <div class="container">
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; Man9 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+
+</html>

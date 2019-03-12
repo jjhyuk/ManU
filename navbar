@@ -1,0 +1,70 @@
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">맨유는 못말려</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav ml-auto">
+        <div class="">
+        <li class="nav-item active">
+          <a class="nav-link" href="#"><?php
+            if(isset($_SESSION[is_login])){
+          printf("%s님 안녕하세요!",$_COOKIE['whoami']);
+
+          ?>
+
+          <?php
+        }
+        ?>
+            <span class="sr-only">(current)</span>
+          </a>
+        </li>
+      </div>
+        <li class="nav-item">
+          <a class="nav-link" href="http://127.0.0.1:2000/">언제든지 물어보세요</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="board.html">자유게시판</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="store.html">온라인스토어</a>
+        </li>
+        <?php
+        if(isset($_SESSION[is_login])){
+        ?>
+        <li class="nav-item">
+          <a href="shopcart.html" class="nav-link">장바구니</a>
+        </li>
+        <?php
+      }
+        else
+        {
+          ?>
+
+        <?php
+        }
+        ?>
+        <?php
+        if(!isset($_SESSION[is_login])){
+        ?>
+        <li class="nav-item">
+          <a href="login.html" class="nav-link">로그인</a>
+        </li>
+        <?php
+      }
+        else
+        {
+          ?>
+          <li class="nav-item">
+            <a  href="logout.php" id="logout" name="logout" class="nav-link">로그아웃</a>
+          </li>
+        <?php
+        }
+        ?>
+
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,204 @@
+<?php
+
+session_start();
+
+$db = mysql_connect( localhost , 'root' , 'sql!' );
+if( !$db ){
+    die('MySQL connect ERROR : ' . mysql_error());
+}
+
+$ret = mysql_select_db( 'userProfile', $db);
+if( !$ret ){
+    die('MySQL select ERROR : '. mysql_error());
+}
+
+$no = $_GET["no"];
+$sql = "SELECT * FROM store WHERE no = " . $no;
+$result = mysql_query($sql);
+$row = mysql_fetch_array($result);
+
+$recent_list = array();
+$data =array();
+$user_id = $_SESSION[user_id];
+session_start();
+if(!isset($_SESSION[is_login]))
+{
+$recent_list = unserialize($_COOKIE['NO_MEMBER']);
+
+array_unshift($recent_list,$no);
+setcookie('NO_MEMBER',serialize($recent_list),time()+60*60*24);
+}
+else
+{
+  $recent_sql = "INSERT INTO recent(user_id,p_num) VALUE('{$user_id}',{$no})";
+
+  $recent_result = mysql_query($recent_sql);
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title><?= $row[p_name] ?></title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/shop-item.css" rel="stylesheet">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      $("#logout").click(function() {
+        $.ajax({
+          type: "POST",
+          url: "logout.php",
+          success: function(response) {
+            if(response == 'success') {
+              alert('로그아웃되었습니다!');
+
+              location.reload();
+            }
+
+            else {
+              alert('로그아웃에 실패하셨습니다');
+            }
+          }
+        });
+        return false;
+      });
+    });
+    </script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      $("#cartin").click(function() {
+        var action = $("#cart_form").attr('action');
+        var form_data = {
+          p_quantity: $("#p_quantity").val(),
+          p_size: $("#p_size").val(),
+          p_no: $("#p_no").val(),
+
+        };
+        $.ajax({
+          type: "POST",
+          url: action,
+          data: form_data,
+          success: function(response) {
+            if(response == 'success') {
+              var r = confirm('장바구니로 이동하시겠습니까?');
+              if(r==true)
+              {
+                window.location.replace('shopcart.html')
+              }
+              else {
+                {
+                  alert('장바구니에 담겼습니다!');
+                }
+              }
+            }
+            else {
+              alert('장바구니에 담지못했습니다!');
+            }
+          }
+        });
+        return false;
+      });
+    });
+    </script>
+  </head>
+
+  <body>
+
+      <?php include ("navbar"); ?>
+
+
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col-lg-3">
+          <h2 class="my-4"><?php echo $row[p_name]; ?></h2>
+          <!--
+          <div class="list-group">
+            <a href="#" class="list-group-item active">Category 1</a>
+            <a href="#" class="list-group-item">Category 2</a>
+            <a href="#" class="list-group-item">Category 3</a>
+          </div>
+        -->
+        </div>
+        <!-- /.col-lg-3 -->
+
+        <div class="col-lg-9">
+
+          <div class="row">
+            <?php
+            echo "<img src=".$row[p_image_front]." />";
+            echo "<img src=".$row[p_image_back]." />";
+            ?>
+            <div class="card-body">
+              <h3 class="card-title"><?php echo $row[p_head]; ?></h3>
+              <h4 style="color:blue"><?php echo $row[p_price]; ?>원</h4>
+              <p class="card-text"><?php echo $row[p_body]; ?></p>
+
+            </div>
+          </div>
+          <!-- /.card -->
+
+          <div class="card card-outline-secondary my-4">
+
+            <div class="card-body">
+              <form id="cart_form" name="cart_form" method="post"action="shopcart.php" oninput="result.value=p_quantity.value*<?php echo $row[p_price] ?>">
+                <input type="hidden" value="<?php echo $no ?>" id="p_no" name="p_no">
+                  갯수: <input id="p_quantity" type="number" name="p_quantity" min="0"  value="0"  />
+                  사이즈: <select id="p_size" name="p_size">
+                    <option>S</option>
+                    <option>M</option>
+                    <option>L</option>
+                    <option>XL</option>
+                    <option>XXL</option>
+                    <option>XXXL</option>
+                  </select>
+                  <div class="card card-outline-secondary my-4">
+                    <div >
+                      총 금액 (원)
+                    </div>
+                    <div class="card-body">
+                       <output name="result" />
+                    </div>
+
+                  </div>
+              <input type="submit" id="cartin" name="cartin" class="btn btn-success" value="장바구니 담기"></input>
+                <input type="submit" class="btn btn-success" value="찜하기"></input>
+              </form>
+            </div>
+          </div>
+
+
+          <!-- /.card -->
+
+        </div>
+        <!-- /.col-lg-9 -->
+
+      </div>
+
+    </div>
+    <!-- /.container -->
+
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+
+</html>
